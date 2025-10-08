@@ -5,16 +5,12 @@ import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
 import { useState } from "react";
 import { View } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as XLSX from "xlsx";
 
 const Home = () => {
   const [data, setData] = useState<AdjacentLot[]>([]);
   const [fileName, setFileName] = useState<string>("Chọn file cần xử lý");
-  const insets = useSafeAreaInsets(); // Get safe area insets
 
   const handlePickFile = async () => {
     try {
@@ -55,6 +51,7 @@ const Home = () => {
         pickedFile={data.length > 0}
       />
       <View className="h-[2px] bg-gray-300 shadow-md my-3" />
+
       <DetailData data={data} />
     </SafeAreaView>
   );

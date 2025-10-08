@@ -4,6 +4,7 @@ import { AdjacentLot } from "@/utils/homeUtils";
 import { CircleQuestionMark } from "lucide-react-native";
 import { useSharedValue } from "react-native-reanimated";
 import Accordion from "../accodiant";
+import EmptyData from "./EmptyData";
 
 type DetailDataProps = {
   data: AdjacentLot[];
@@ -24,20 +25,24 @@ export const DetailData = ({ data }: DetailDataProps) => {
           <CircleQuestionMark />
         </TouchableOpacity>
       </View>
-      <ScrollView>
-        <View className="gap-4 mb-2">
-          {data.map((item, index) => (
-            <Accordion
-              key={index}
-              label={`Liền kề ${item.id}`}
-              subLabel={`${item.lots.length} lô`}
-              index={index}
-              openIndex={openIndex}
-              data={item.lots}
-            />
-          ))}
-        </View>
-      </ScrollView>
+      {data.length === 0 ? (
+        <EmptyData />
+      ) : (
+        <ScrollView>
+          <View className="gap-4 mb-2">
+            {data.map((item, index) => (
+              <Accordion
+                key={index}
+                label={`Liền kề ${item.id}`}
+                subLabel={`${item.lots.length} lô`}
+                index={index}
+                openIndex={openIndex}
+                data={item.lots}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 };

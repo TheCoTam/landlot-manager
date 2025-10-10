@@ -1,6 +1,13 @@
+export type Lot = {
+  lotId: number;
+  area: number;
+  auctionPrice?: number;
+  total?: number;
+};
+
 export type AdjacentLot = {
   id: number;
-  lots: { lotId: number; area: number; auctionPrice?: number }[];
+  lots: Lot[];
 };
 
 export function refineData(sheetData: any[]) {
@@ -48,3 +55,7 @@ export function refineData(sheetData: any[]) {
 
   return refinedData;
 }
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat("vi-VN").format(value);
+};

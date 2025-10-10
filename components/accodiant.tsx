@@ -1,3 +1,4 @@
+import { formatCurrency, Lot } from "@/utils/homeUtils";
 import { Triangle } from "lucide-react-native";
 import React, { ReactNode, useState } from "react";
 import {
@@ -24,6 +25,9 @@ type AccordionItemProps = {
   style?: StyleProp<ViewStyle>;
   duration?: number;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 
 function AccordionItem({
   isExpanded,
@@ -60,68 +64,11 @@ function AccordionItem({
   );
 }
 
-function AccordionContent({
-  data,
-}: {
-  data: { lotId: number; area: number; auctionPrice?: number }[];
-}) {
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+function AccordionContent({ data }: { data: Lot[] }) {
   const [headerHeight, setHeaderHeight] = useState(0);
-  const items = [
-    {
-      lotId: "Lô 1",
-      area: 142.5,
-      price: "19.200.000đ",
-      total: "1.628.000.000đ",
-    },
-    {
-      lotId: "Lô 2",
-      area: 150.0,
-      price: "20.000.000đ",
-      total: "1.800.000.000đ",
-    },
-    {
-      lotId: "Lô 3",
-      area: 130.0,
-      price: "18.500.000đ",
-      total: "1.550.000.000đ",
-    },
-    {
-      lotId: "Lô 4",
-      area: 160.0,
-      price: "21.000.000đ",
-      total: "1.920.000.000đ",
-    },
-    {
-      lotId: "Lô 5",
-      area: 145.0,
-      price: "19.500.000đ",
-      total: "1.750.000.000đ",
-    },
-    {
-      lotId: "Lô 6",
-      area: 155.0,
-      price: "20.500.000đ",
-      total: "1.850.000.000đ",
-    },
-    {
-      lotId: "Lô 7",
-      area: 135.0,
-      price: "18.800.000đ",
-      total: "1.600.000.000đ",
-    },
-    {
-      lotId: "Lô 8",
-      area: 165.0,
-      price: "21.500.000đ",
-      total: "1.775.000.000đ",
-    },
-    {
-      lotId: "Lô 9",
-      area: 140.0,
-      price: "19.000.000đ",
-      total: "1.680.000.000đ",
-    },
-  ];
 
   return (
     <View className="w-full px-6 flex flex-row">
@@ -154,6 +101,9 @@ function AccordionContent({
   );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 function ItemHeader() {
   return (
     <View className="border-b border-dashed px-6 py-4 text-lg flex flex-row">
@@ -178,27 +128,37 @@ function Item({
     <View className="border-b border-dashed px-6 py-4 text-lg flex flex-row">
       <Text className="flex-[1.5] text-center">{lotId}</Text>
       <Text className="flex-[2] text-center">{area}</Text>
-      <Text className="flex-[3] text-right">{price}</Text>
-      <Text className="flex-[3.5] text-right">{area * price}</Text>
+      <Text className="flex-[3] text-right">{formatCurrency(price)}</Text>
+      <Text className="flex-[3.5] text-right">
+        {formatCurrency(area * price)}
+      </Text>
     </View>
   );
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 function Parent({
   open,
   data,
+  adjacent,
 }: {
   open: SharedValue<boolean>;
-  data: { lotId: number; area: number; auctionPrice?: number }[];
+  data: Lot[];
+  adjacent: string;
 }) {
   return (
     <View className="w-full">
-      <AccordionItem isExpanded={open} viewKey="Accordion">
+      <AccordionItem isExpanded={open} viewKey={`${adjacent}-${data.length}`}>
         <AccordionContent data={data} />
       </AccordionItem>
     </View>
   );
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
 
 export default function Accordion({
   label,
@@ -211,7 +171,7 @@ export default function Accordion({
   subLabel?: string;
   index: number;
   openIndex: SharedValue<number | null>;
-  data: { lotId: number; area: number; auctionPrice?: number }[];
+  data: Lot[];
 }) {
   const isOpen = useDerivedValue(() => openIndex.value === index);
   const rotation = useDerivedValue(() =>
@@ -242,7 +202,7 @@ export default function Accordion({
       </TouchableHighlight>
 
       <View className="flex-1 items-center justify-center">
-        <Parent open={isOpen} data={data} />
+        <Parent open={isOpen} data={data} adjacent={index.toString()} />
       </View>
     </View>
   );

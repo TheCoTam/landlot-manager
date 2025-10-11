@@ -7,7 +7,7 @@ import { useSharedValue } from "react-native-reanimated";
 import Accordion from "../accodiant";
 import EditPriceModel, { EditedLot } from "./EditPriceModel";
 import EmptyData from "./EmptyData";
-import GuildModel from "./GuildModel";
+import GuildModal from "./GuildModal";
 
 type DetailDataProps = {
   data: AdjacentLot[];
@@ -35,9 +35,11 @@ export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
       <View className="flex flex-row justify-between items-center">
         <Text className="text-2xl font-semibold">Tổng số lô: {totalLots}</Text>
         <View className="flex flex-row items-center gap-6">
-          <TouchableOpacity onPress={() => setEditPriceVisible(true)}>
-            <Pencil size={22} />
-          </TouchableOpacity>
+          {data.length > 0 && (
+            <TouchableOpacity onPress={() => setEditPriceVisible(true)}>
+              <Pencil size={22} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity onPress={() => setGuildVisible(true)}>
             <CircleQuestionMark />
           </TouchableOpacity>
@@ -61,7 +63,7 @@ export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
           </View>
         </ScrollView>
       )}
-      <GuildModel visible={guildVisible} onClose={onCloseGuildModel} />
+      <GuildModal visible={guildVisible} onClose={onCloseGuildModel} />
       <EditPriceModel
         visible={editPriceVisible}
         onClose={onCloseEditPriceModel}

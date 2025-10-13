@@ -1,10 +1,12 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+import { OPTIONS } from "@/Constants/DataFilter";
 import { AdjacentLot } from "@/utils/homeUtils";
 import { CircleQuestionMark, Pencil } from "lucide-react-native";
 import { useRef, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import Accordion from "../accodiant";
+import RadioButton from "../radioButton";
 import EditPriceModal, { EditedLot } from "./EditPriceModal";
 import EmptyData from "./EmptyData";
 import GuildModal from "./GuildModal";
@@ -12,8 +14,16 @@ import GuildModal from "./GuildModal";
 type DetailDataProps = {
   data: AdjacentLot[];
   onUpdate: (editedlot: EditedLot) => void;
+  selectedFilter: string;
+  setSelectedFilter: (filter: string) => void;
 };
-export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
+
+export const DetailData = ({
+  data,
+  onUpdate,
+  selectedFilter,
+  setSelectedFilter,
+}: DetailDataProps) => {
   const [guildVisible, setGuildVisible] = useState(false);
   const [editPriceVisible, setEditPriceVisible] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
@@ -38,12 +48,19 @@ export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
   };
 
   return (
-    <View
-      className="px-4 flex-1 mb-2 gap-4
-    "
-    >
+    <View className="px-4 flex-1 gap-4">
       <View className="flex flex-row justify-between items-center">
         <Text className="text-2xl font-semibold">Tổng số lô: {totalLots}</Text>
+        <View className="flex flex-row gap-4">
+          {OPTIONS.map((option) => (
+            <RadioButton
+              key={option.value}
+              label={option.label}
+              selected={selectedFilter === option.value}
+              onPress={() => setSelectedFilter(option.value)}
+            />
+          ))}
+        </View>
         <View className="flex flex-row items-center gap-6">
           {data.length > 0 && (
             <TouchableOpacity onPress={() => setEditPriceVisible(true)}>
@@ -58,8 +75,8 @@ export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
       {data.length === 0 ? (
         <EmptyData />
       ) : (
-        <ScrollView>
-          <View className="gap-4 mb-2">
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View className="gap-4">
             {data.map((item, index) => (
               <Accordion
                 key={index}

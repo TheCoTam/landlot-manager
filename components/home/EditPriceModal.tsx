@@ -1,5 +1,6 @@
 import { useDebounce } from "@/hooks/use-debounce";
 import { AdjacentLot, Lot } from "@/utils/homeUtils";
+import { Camera } from "lucide-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Modal,
@@ -304,9 +305,12 @@ const EditPriceModal = ({ visible, onClose, data, onUpdate }: Props) => {
     >
       <View className="flex-1 items-center justify-center bg-black/50">
         <View className="bg-white rounded-2xl p-6 w-[85%] flex gap-6">
-          <Text className="text-2xl font-bold mb-4">
-            Thay đổi giá đấu lô đất
-          </Text>
+          <View className="flex flex-row items-center justify-between mb-4">
+            <Text className="text-2xl font-bold">Thay đổi giá đấu lô đất</Text>
+            <TouchableOpacity>
+              <Camera />
+            </TouchableOpacity>
+          </View>
 
           <View className="flex gap-4">
             <View className="flex flex-row items-center gap-4">

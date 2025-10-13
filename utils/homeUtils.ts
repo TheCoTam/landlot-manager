@@ -56,6 +56,23 @@ export function refineData(sheetData: any[]) {
   return refinedData;
 }
 
+export const filterData = (data: AdjacentLot[]) => {
+  const filteredData = [];
+  for (let i = 0; i < data.length; i++) {
+    const tmpLots = data[i].lots.filter(
+      (lot) => lot.auctionPrice && lot.auctionPrice > 0
+    );
+
+    if (tmpLots.length > 0) {
+      filteredData.push({
+        id: data[i].id,
+        lots: tmpLots,
+      });
+    }
+  }
+  return filteredData;
+};
+
 export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("vi-VN").format(value);
 };
@@ -148,13 +165,9 @@ export const generateHTMLForPreview = (data: AdjacentLot[]) => {
       <head>
         <meta charset="UTF-8" />
         <style>
-          @page {
-            size: A4;
-            margin: 10mm;
-          }
           body {
             font-family: Arial, sans-serif;
-            padding: 5mm;
+            padding: 0mm;
             margin: 0;
           }
           h1 {
@@ -165,7 +178,7 @@ export const generateHTMLForPreview = (data: AdjacentLot[]) => {
             width: 100%;
             border-collapse: collapse;
             page-break-inside: auto;
-            font-size: 20px;
+            font-size: 30px;
 
           }
           th, td {
@@ -176,16 +189,12 @@ export const generateHTMLForPreview = (data: AdjacentLot[]) => {
           }
           thead {
             background-color: #e0e7ff;
-            display: table-row-group;
-          }
-          tr {
-            page-break-inside: avoid;
           }
           .page {
             background: white;
-            width: 210mm;
+            width: 100%;
             min-height: 297mm;
-            padding: 5mm;
+            padding: 0 5mm;
             box-sizing: border-box;
           }
         </style>

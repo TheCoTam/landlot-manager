@@ -77,7 +77,7 @@ const ExportModal = ({
         >
           Xem trước
         </Text>
-        <View className="w-full flex-1 my-5">
+        <View className="w-full flex-1 mb-5">
           <WebView originWhitelist={["*"]} source={{ html: htmlForPreview }} />
         </View>
       </View>

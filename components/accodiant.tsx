@@ -83,7 +83,7 @@ function AccordionContent({ data }: { data: Lot[] }) {
           <ItemHeader />
         </View>
         <ScrollView
-          style={{ height: headerHeight * 5 + 2 }}
+          style={{ maxHeight: headerHeight * 5 + 2 }}
           className="bg-white"
           nestedScrollEnabled
         >

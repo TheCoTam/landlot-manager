@@ -19,6 +19,9 @@ const EmptyData = () => {
         Hoặc bấm vào biểu tượng <CircleQuestionMark size={16} /> để xem hướng
         dẫn
       </Text>
+      <Text className={textClassName}>
+        Hoặc thay đổi bộ lọc để xem dữ liệu khác
+      </Text>
     </SafeAreaView>
   );
 };

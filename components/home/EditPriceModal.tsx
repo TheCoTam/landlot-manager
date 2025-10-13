@@ -227,7 +227,7 @@ const TotalPrice = ({ total }: { total: number }) => {
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-const EditPriceModel = ({ visible, onClose, data, onUpdate }: Props) => {
+const EditPriceModal = ({ visible, onClose, data, onUpdate }: Props) => {
   const landIdList = data.map((item) => item.id);
   const [editedLot, setEditedLot] = useState<EditedLot>({
     landId: -1,
@@ -284,7 +284,7 @@ const EditPriceModel = ({ visible, onClose, data, onUpdate }: Props) => {
     }));
   };
 
-  const handleCloseModel = () => {
+  const handleCloseModal = () => {
     setEditedLot({
       landId: -1,
       lotId: -1,
@@ -335,7 +335,7 @@ const EditPriceModel = ({ visible, onClose, data, onUpdate }: Props) => {
           </Text>
           <View className="flex flex-row items-center justify-end gap-6">
             <TouchableOpacity
-              onPress={handleCloseModel}
+              onPress={handleCloseModal}
               className="bg-white border border-gray-300 rounded-lg p-3"
             >
               <Text className="text-center">Đóng</Text>
@@ -345,7 +345,7 @@ const EditPriceModel = ({ visible, onClose, data, onUpdate }: Props) => {
               disabled={!possiableUpdate}
               onPress={() => {
                 onUpdate(editedLot);
-                handleCloseModel();
+                handleCloseModal();
               }}
             >
               <Text className="text-white text-center">Cập nhật</Text>
@@ -357,4 +357,4 @@ const EditPriceModel = ({ visible, onClose, data, onUpdate }: Props) => {
   );
 };
 
-export default EditPriceModel;
+export default EditPriceModal;

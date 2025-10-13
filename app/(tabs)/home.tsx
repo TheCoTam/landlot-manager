@@ -1,7 +1,3 @@
-import { DetailData } from "@/components/home/DetailData";
-import { EditedLot } from "@/components/home/EditPriceModel";
-import SelectFile from "@/components/home/SelectFile";
-import { AdjacentLot, refineData } from "@/utils/homeUtils";
 import { getDocumentAsync } from "expo-document-picker";
 import { File } from "expo-file-system";
 import { useState } from "react";
@@ -9,9 +5,18 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { read as xlsxRead, utils as xlsxUtils } from "xlsx";
 
+import { DetailData } from "@/components/home/DetailData";
+import { EditedLot } from "@/components/home/EditPriceModal";
+import ExportButton from "@/components/home/ExportButton";
+import SelectFile from "@/components/home/SelectFile";
+
+import ExportModal from "@/components/home/ExportModal";
+import { AdjacentLot, refineData } from "@/utils/homeUtils";
+
 const Home = () => {
   const [data, setData] = useState<AdjacentLot[]>([]);
   const [fileName, setFileName] = useState<string>("Chọn file cần xử lý");
+  const [exportModalVisible, setExportModalVisible] = useState(false);
 
   const handlePickFile = async () => {
     try {
@@ -68,6 +73,14 @@ const Home = () => {
     );
   };
 
+  const handleExport = () => {
+    setExportModalVisible(true);
+  };
+
+  const handleCloseExportModal = () => {
+    setExportModalVisible(false);
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <SelectFile
@@ -78,6 +91,12 @@ const Home = () => {
       <View className="h-[2px] bg-gray-300 shadow-md my-3" />
 
       <DetailData data={data} onUpdate={handleUpdateLot} />
+      <ExportButton onExport={handleExport} />
+      <ExportModal
+        visible={exportModalVisible}
+        onClose={handleCloseExportModal}
+        data={data}
+      />
     </SafeAreaView>
   );
 };

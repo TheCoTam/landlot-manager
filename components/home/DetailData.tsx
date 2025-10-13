@@ -2,10 +2,10 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { AdjacentLot } from "@/utils/homeUtils";
 import { CircleQuestionMark, Pencil } from "lucide-react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
 import Accordion from "../accodiant";
-import EditPriceModel, { EditedLot } from "./EditPriceModel";
+import EditPriceModal, { EditedLot } from "./EditPriceModal";
 import EmptyData from "./EmptyData";
 import GuildModal from "./GuildModal";
 
@@ -16,15 +16,25 @@ type DetailDataProps = {
 export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
   const [guildVisible, setGuildVisible] = useState(false);
   const [editPriceVisible, setEditPriceVisible] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
   let totalLots = 0;
   data.map((adjacentLot) => (totalLots += adjacentLot.lots.length));
 
   const openIndex = useSharedValue<number | null>(null);
-  const onCloseGuildModel = () => {
+  const onCloseGuildModal = () => {
     setGuildVisible(false);
   };
-  const onCloseEditPriceModel = () => {
+  const onCloseEditPriceModal = () => {
     setEditPriceVisible(false);
+  };
+  const handleAccordionPress = () => {
+    // Cuộn lên 50px mỗi khi bấm
+    // scrollRef.current?.scrollTo({
+    //   y: 50,
+    //   animated: true,
+    // });
+
+    console.log("Scrolled to 50px");
   };
 
   return (
@@ -58,15 +68,16 @@ export const DetailData = ({ data, onUpdate }: DetailDataProps) => {
                 index={index}
                 openIndex={openIndex}
                 data={item.lots}
+                onPressAccordion={handleAccordionPress}
               />
             ))}
           </View>
         </ScrollView>
       )}
-      <GuildModal visible={guildVisible} onClose={onCloseGuildModel} />
-      <EditPriceModel
+      <GuildModal visible={guildVisible} onClose={onCloseGuildModal} />
+      <EditPriceModal
         visible={editPriceVisible}
-        onClose={onCloseEditPriceModel}
+        onClose={onCloseEditPriceModal}
         data={data}
         onUpdate={onUpdate}
       />

@@ -166,18 +166,21 @@ export default function Accordion({
   index,
   openIndex,
   data,
+  onPressAccordion,
 }: {
   label: string;
   subLabel?: string;
   index: number;
   openIndex: SharedValue<number | null>;
   data: Lot[];
+  onPressAccordion: () => void;
 }) {
   const isOpen = useDerivedValue(() => openIndex.value === index);
   const rotation = useDerivedValue(() =>
     withTiming(isOpen.value ? 180 : 90, { duration: 300 })
   );
   const onPress = () => {
+    // onPressAccordion();
     openIndex.value = openIndex.value === index ? null : index;
   };
 

@@ -59,3 +59,176 @@ export function refineData(sheetData: any[]) {
 export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("vi-VN").format(value);
 };
+
+export const generateHTMLForPrint = (data: AdjacentLot[]) => {
+  return `
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 5mm;
+            margin: 0;
+          }
+          h1 {
+            text-align: center;
+            color: #1e40af;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+            font-size: 20px;
+
+          }
+          th, td {
+            border: 1px solid #1e40af;
+            padding: 8px;
+            text-align: center;
+            line-height: 1.8;
+          }
+          thead {
+            background-color: #e0e7ff;
+            display: table-row-group;
+          }
+          tr {
+            page-break-inside: avoid;
+          }
+        </style>
+      </head>
+      <body>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:13%">Lô đất</th>
+              <th style="width:14%">Diện tích</th>
+              <th style="width:23%">Đơn giá</th>
+              <th style="width:25%">Thành tiền</th>
+              <th style="width:25%">Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data
+              .map(
+                (group) => `
+                <tr>
+                  <td colspan="5" style="text-align: left;">Liền kề ${group.id}</td>
+                </tr>
+                ${group.lots
+                  .map(
+                    (lot) => `
+                    <tr>
+                      <td>${lot.lotId}</td>
+                      <td>${lot.area}</td>
+                      <td style="text-align: right;">${formatCurrency(lot.auctionPrice || 0)}</td>
+                      <td style="text-align: right;">${formatCurrency(lot.total || 0)}</td>
+                      <td></td>
+                    </tr>
+                  `
+                  )
+                  .join("")}
+              `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+};
+
+export const generateHTMLForPreview = (data: AdjacentLot[]) => {
+  return `
+  <html>
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 5mm;
+            margin: 0;
+          }
+          h1 {
+            text-align: center;
+            color: #1e40af;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: auto;
+            font-size: 20px;
+
+          }
+          th, td {
+            border: 1px solid #1e40af;
+            padding: 8px;
+            text-align: center;
+            line-height: 1.8;
+          }
+          thead {
+            background-color: #e0e7ff;
+            display: table-row-group;
+          }
+          tr {
+            page-break-inside: avoid;
+          }
+          .page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 5mm;
+            box-sizing: border-box;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:13%">Lô đất</th>
+                <th style="width:14%">Diện tích</th>
+                <th style="width:23%">Đơn giá</th>
+                <th style="width:25%">Thành tiền</th>
+                <th style="width:25%">Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data
+                .map(
+                  (group) => `
+                  <tr>
+                    <td colspan="5" style="text-align: left;">Liền kề ${group.id}</td>
+                  </tr>
+                  ${group.lots
+                    .map(
+                      (lot) => `
+                      <tr>
+                        <td>${lot.lotId}</td>
+                        <td>${lot.area}</td>
+                        <td style="text-align: right;">${formatCurrency(lot.auctionPrice || 0)}</td>
+                        <td style="text-align: right;">${formatCurrency(lot.total || 0)}</td>
+                        <td></td>
+                      </tr>
+                    `
+                    )
+                    .join("")}
+                `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      </body>
+    </html>
+  `;
+};

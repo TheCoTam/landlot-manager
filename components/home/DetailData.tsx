@@ -5,7 +5,7 @@ import { AdjacentLot } from "@/utils/homeUtils";
 import { CircleQuestionMark, Pencil } from "lucide-react-native";
 import { useRef, useState } from "react";
 import { useSharedValue } from "react-native-reanimated";
-import Accordion from "../accodiant";
+import Accordion from "../accodion";
 import RadioButton from "../radioButton";
 import EditPriceModal, { EditedLot } from "./EditPriceModal";
 import EmptyData from "./EmptyData";
@@ -13,6 +13,7 @@ import GuildModal from "./GuildModal";
 
 type DetailDataProps = {
   data: AdjacentLot[];
+  displayData: AdjacentLot[];
   onUpdate: (editedlot: EditedLot) => void;
   selectedFilter: string;
   setSelectedFilter: (filter: string) => void;
@@ -20,6 +21,7 @@ type DetailDataProps = {
 
 export const DetailData = ({
   data,
+  displayData,
   onUpdate,
   selectedFilter,
   setSelectedFilter,
@@ -28,7 +30,7 @@ export const DetailData = ({
   const [editPriceVisible, setEditPriceVisible] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   let totalLots = 0;
-  data.map((adjacentLot) => (totalLots += adjacentLot.lots.length));
+  displayData.map((adjacentLot) => (totalLots += adjacentLot.lots.length));
 
   const openIndex = useSharedValue<number | null>(null);
   const onCloseGuildModal = () => {
@@ -72,12 +74,12 @@ export const DetailData = ({
           </TouchableOpacity>
         </View>
       </View>
-      {data.length === 0 ? (
+      {displayData.length === 0 ? (
         <EmptyData />
       ) : (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View className="gap-4">
-            {data.map((item, index) => (
+          <View className="gap-4 bg-gray-">
+            {displayData.map((item, index) => (
               <Accordion
                 key={index}
                 label={`Liền kề ${item.id}`}

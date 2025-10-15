@@ -102,16 +102,18 @@ const Home = () => {
       <View className="h-[2px] bg-gray-300 shadow-md my-3" />
 
       <DetailData
-        data={displayData}
+        data={data}
+        displayData={displayData}
         onUpdate={handleUpdateLot}
         selectedFilter={selectedOption}
         setSelectedFilter={setSelectedOption}
       />
-      <ExportButton onExport={handleExport} />
+      {displayData.length > 0 && <ExportButton onExport={handleExport} />}
       <ExportModal
         visible={exportModalVisible}
         onClose={handleCloseExportModal}
         data={displayData}
+        inputFilename={fileName}
       />
     </SafeAreaView>
   );

@@ -8,6 +8,7 @@ export type Lot = {
 export type AdjacentLot = {
   id: number;
   lots: Lot[];
+  section?: string;
 };
 
 export function refineData(sheetData: any[]) {

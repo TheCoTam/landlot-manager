@@ -1,0 +1,122 @@
+import {
+  NUM_OF_COLS_DATA,
+  WORD_HEADER_KEYWORDS,
+} from "@/Constants/word/WordHeader";
+import { AdjacentLot } from "./excelUtils";
+
+interface DocxBody {
+  "w:p"?: any | any[];
+  "w:tbl"?: any | any[];
+  [key: string]: any;
+}
+
+export function extractWordData(docXml: DocxBody) {
+  // Extract tables from the document body
+  const tables = Array.isArray(docXml["w:tbl"])
+    ? docXml["w:tbl"]
+    : [docXml["w:tbl"]];
+
+  for (const table of tables) {
+    const rows = Array.isArray(table["w:tr"]) ? table["w:tr"] : [table["w:tr"]];
+    if (!rows?.length || !rows[0]?.["w:tc"]) continue;
+
+    const firstRow = rows[0];
+    const cells = Array.isArray(firstRow["w:tc"])
+      ? firstRow["w:tc"]
+      : [firstRow["w:tc"]];
+    const cellsData = cells.map((cell: any) => extractTextFromCell(cell));
+    if (cellsData.length !== WORD_HEADER_KEYWORDS.length) continue;
+
+    if (isRowMatched(cellsData, WORD_HEADER_KEYWORDS)) {
+      const tableData: string[][] = rows.map((row: any) => {
+        // Extract cells from each row (convert to array if single cell)
+        const cells = Array.isArray(row["w:tc"]) ? row["w:tc"] : [row["w:tc"]];
+
+        return cells.map((cell: any) => extractTextFromCell(cell));
+      });
+
+      const resData: AdjacentLot[] = [];
+      const currentAdjacentLots: AdjacentLot = { id: 0, lots: [] };
+      for (const row of tableData) {
+        if (isRowMatched(row, WORD_HEADER_KEYWORDS)) continue;
+        if (isRowMatched(row, ["đồng", "m2", "lô đất"], 0.6)) continue;
+        if (isRowMatched(row, ["tổng"])) continue;
+        if (isRowMatched(row, ["liền kề", "lk"], 0.5)) {
+          if (currentAdjacentLots.id !== 0)
+            resData.push({ ...currentAdjacentLots });
+          const id = parseInt(
+            row
+              .find(
+                (item) =>
+                  item.toLowerCase().includes("lk") ||
+                  item.toLowerCase().includes("liền kề")
+              )
+              ?.replace(/\D/g, "") || "0"
+          );
+
+          currentAdjacentLots.id = id;
+          currentAdjacentLots.lots = [];
+          continue;
+        }
+
+        if (row.length === NUM_OF_COLS_DATA) {
+          const lotId = parseInt(row[1]) || 0;
+          const area = parseFloat(row[2].replace(",", ".")) || 0;
+
+          currentAdjacentLots.lots.push({
+            lotId,
+            area,
+            auctionPrice: 0,
+            total: 0,
+          });
+          continue;
+        }
+
+        if (currentAdjacentLots.id !== 0)
+          resData.push({ ...currentAdjacentLots });
+        currentAdjacentLots.id = 0;
+        currentAdjacentLots.lots = [];
+        resData.push({ id: -1, lots: [], section: row.join(" ") });
+      }
+
+      resData.push({ ...currentAdjacentLots });
+      return resData;
+    }
+  }
+
+  return [];
+}
+
+const isRowMatched = (
+  cellsData: string[],
+  keywords: string[],
+  threshold: number = 0.8
+) => {
+  const cellsText = cellsData.map((cell) => cell.toLowerCase()).join("");
+  const matchCount = keywords.filter((keyword) =>
+    cellsText.includes(keyword)
+  ).length;
+  return matchCount / keywords.length >= threshold;
+};
+
+function extractTextFromCell(cell: any): string {
+  // Return empty string if no paragraphs in cell
+  if (!cell["w:p"]) return "";
+  // Ensure paragraphs are in an array
+  const paragraphs = Array.isArray(cell["w:p"]) ? cell["w:p"] : [cell["w:p"]];
+  const texts: any[] = [];
+
+  for (const p of paragraphs) {
+    if (!p["w:r"]) continue;
+    const runs = Array.isArray(p["w:r"]) ? p["w:r"] : [p["w:r"]];
+    for (const r of runs) {
+      const t = r["w:t"];
+      if (t !== undefined) {
+        const text = typeof t === "object" ? (t["#text"] ?? "") : t;
+        texts.push(text);
+      }
+    }
+  }
+
+  return texts.join(" ").trim();
+}

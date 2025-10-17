@@ -5,16 +5,16 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { read as xlsxRead, utils as xlsxUtils } from "xlsx";
 
-import { DetailData } from "@/components/home/DetailData";
-import { EditedLot } from "@/components/home/EditPriceModal";
-import ExportButton from "@/components/home/ExportButton";
-import SelectFile from "@/components/home/SelectFile";
+import { DetailData } from "@/components/DetailData";
+import { EditedLot } from "@/components/excel/EditPriceModal";
+import ExportButton from "@/components/excel/ExportButton";
+import SelectFile from "@/components/SelectFile";
 
-import ExportModal from "@/components/home/ExportModal";
+import ExportModal from "@/components/excel/ExportModal";
 import { OPTIONS } from "@/Constants/DataFilter";
-import { AdjacentLot, filterData, refineData } from "@/utils/homeUtils";
+import { AdjacentLot, filterData, refineData } from "@/utils/excelUtils";
 
-const Home = () => {
+const Excel = () => {
   const [data, setData] = useState<AdjacentLot[]>([]);
   const [displayData, setDisplayData] = useState<AdjacentLot[]>([]);
   const [fileName, setFileName] = useState<string>("Chọn file cần xử lý");
@@ -119,4 +119,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Excel;

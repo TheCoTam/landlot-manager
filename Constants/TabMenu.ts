@@ -1,4 +1,10 @@
-import { Construction, File, LucideIcon, Phone } from "lucide-react-native";
+import {
+  FileDown,
+  FileSpreadsheet,
+  FileText,
+  LucideIcon,
+  Phone,
+} from "lucide-react-native";
 
 export type TabType = {
   name: string;
@@ -9,12 +15,13 @@ export type TabType = {
 
 export const TAB_MENU: TabType[] = [
   {
-    name: "home",
-    label: "Bảo trì",
-    icon: Construction,
-    route: "/home",
+    name: "excel",
+    label: "Excel",
+    icon: FileSpreadsheet,
+    route: "/excel",
   },
-  { name: "file", label: "Tài liệu", icon: File, route: "/file" },
+  { name: "word", label: "Word", icon: FileText, route: "/word" },
+  { name: "file", label: "Tài liệu", icon: FileDown, route: "/file" },
   { name: "contact", label: "Liên Hệ", icon: Phone, route: "/contact" },
 ];
 

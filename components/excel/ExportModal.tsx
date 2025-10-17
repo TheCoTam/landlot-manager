@@ -2,7 +2,7 @@ import {
   AdjacentLot,
   generateHTMLForPreview,
   generateHTMLForPrint,
-} from "@/utils/homeUtils";
+} from "@/utils/excelUtils";
 import { File, Paths } from "expo-file-system";
 import { printAsync, printToFileAsync } from "expo-print";
 import {

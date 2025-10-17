@@ -1,4 +1,4 @@
-import { formatCurrency, Lot } from "@/utils/homeUtils";
+import { formatCurrency, Lot } from "@/utils/excelUtils";
 import { Triangle } from "lucide-react-native";
 import React, { ReactNode, useState } from "react";
 import {
@@ -170,8 +170,8 @@ export default function Accordion({
 }: {
   label: string;
   subLabel?: string;
-  index: number;
-  openIndex: SharedValue<number | null>;
+  index: string;
+  openIndex: SharedValue<string | null>;
   data: Lot[];
   onPressAccordion: () => void;
 }) {

@@ -1,15 +1,16 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-
-import { OPTIONS } from "@/Constants/DataFilter";
-import { AdjacentLot } from "@/utils/homeUtils";
 import { CircleQuestionMark, Pencil } from "lucide-react-native";
 import { useRef, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
-import Accordion from "../accodion";
-import RadioButton from "../radioButton";
-import EditPriceModal, { EditedLot } from "./EditPriceModal";
-import EmptyData from "./EmptyData";
-import GuildModal from "./GuildModal";
+
+import { OPTIONS } from "@/Constants/DataFilter";
+import { AdjacentLot } from "@/utils/excelUtils";
+import { splitDataById } from "@/utils/utils";
+import Accordion from "./accodion";
+import EditPriceModal, { EditedLot } from "./excel/EditPriceModal";
+import EmptyData from "./excel/EmptyData";
+import GuildModal from "./excel/GuildModal";
+import RadioButton from "./radioButton";
 
 type DetailDataProps = {
   data: AdjacentLot[];
@@ -32,7 +33,7 @@ export const DetailData = ({
   let totalLots = 0;
   displayData.map((adjacentLot) => (totalLots += adjacentLot.lots.length));
 
-  const openIndex = useSharedValue<number | null>(null);
+  const openIndex = useSharedValue<string | null>(null);
   const onCloseGuildModal = () => {
     setGuildVisible(false);
   };
@@ -40,11 +41,7 @@ export const DetailData = ({
     setEditPriceVisible(false);
   };
   const handleAccordionPress = () => {
-    // Cuộn lên 50px mỗi khi bấm
-    // scrollRef.current?.scrollTo({
-    //   y: 50,
-    //   animated: true,
-    // });
+    // TODO: Fix scroll issue
 
     console.log("Scrolled to 50px");
   };
@@ -77,20 +74,39 @@ export const DetailData = ({
       {displayData.length === 0 ? (
         <EmptyData />
       ) : (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          <View className="gap-4 bg-gray-">
-            {displayData.map((item, index) => (
-              <Accordion
-                key={index}
-                label={`Liền kề ${item.id}`}
-                subLabel={`${item.lots.length} lô`}
-                index={index}
-                openIndex={openIndex}
-                data={item.lots}
-                onPressAccordion={handleAccordionPress}
-              />
-            ))}
-          </View>
+        <ScrollView contentContainerStyle={{ gap: 20 }}>
+          {splitDataById(displayData).map((groupData, groupIndex) => {
+            let section = "";
+            if (groupData[0].id === -1) {
+              section = groupData.shift()?.section || "";
+            }
+
+            return (
+              <View key={groupIndex}>
+                {section?.trim() !== "" && (
+                  <Text className="text-lg mb-5">{section}</Text>
+                )}
+                <ScrollView
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  nestedScrollEnabled
+                >
+                  <View className="gap-4 bg-gray-">
+                    {groupData.map((item, index) => (
+                      <Accordion
+                        key={index}
+                        label={`Liền kề ${item.id}`}
+                        subLabel={`${item.lots.length} lô`}
+                        index={`${groupIndex}-${index}`}
+                        openIndex={openIndex}
+                        data={item.lots}
+                        onPressAccordion={handleAccordionPress}
+                      />
+                    ))}
+                  </View>
+                </ScrollView>
+              </View>
+            );
+          })}
         </ScrollView>
       )}
       <GuildModal visible={guildVisible} onClose={onCloseGuildModal} />

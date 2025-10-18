@@ -20,9 +20,6 @@ export function refineData(sheetData: any[]) {
   const areaHeader = headers.findIndex((item: String) =>
     item.toString().toLowerCase().includes("diện tích")
   );
-  //   const auctionPriceHeader = headers.findIndex((item: String) =>
-  //     item.toString().toLowerCase().includes("giá đấu")
-  //   );
 
   if (landIdHeader === -1 || areaHeader === -1) return [];
 
@@ -30,18 +27,31 @@ export function refineData(sheetData: any[]) {
   const currentAdjacentLots: AdjacentLot = { id: 0, lots: [] };
 
   for (let i = 0; i < rawData.length; i++) {
-    const row = rawData[i];
+    const row = rawData[i].filter(
+      (cell: string | number) =>
+        cell !== undefined && cell !== null && cell.toString().trim() !== ""
+    );
 
-    const landId = row[landIdHeader].toString().toLowerCase();
+    if (row.length === 0) continue;
+    if (row.length === 1) {
+      if (currentAdjacentLots.lots.length > 0)
+        refinedData.push({ ...currentAdjacentLots });
 
-    if (landId.includes("lk") || landId.includes("liền kề")) {
-      refinedData.push({ ...currentAdjacentLots });
-      currentAdjacentLots.id = parseInt(landId.replace(/\D/g, ""));
-
-      currentAdjacentLots.lots = [];
-
+      const data = row.join("").trim();
+      if (
+        data.toLowerCase().includes("lk") ||
+        data.toLowerCase().includes("liền kề")
+      ) {
+        currentAdjacentLots.id = parseInt(data.replace(/\D/g, ""));
+        currentAdjacentLots.lots = [];
+      } else {
+        refinedData.push({ id: -1, lots: [], section: data });
+        currentAdjacentLots.id = 0;
+        currentAdjacentLots.lots = [];
+      }
       continue;
     }
+    const landId = row[landIdHeader].toString().toLowerCase();
 
     const area = parseFloat(row[areaHeader]);
     const tmpLot = {
@@ -52,27 +62,9 @@ export function refineData(sheetData: any[]) {
     currentAdjacentLots.lots.push(tmpLot);
   }
   refinedData.push({ ...currentAdjacentLots });
-  refinedData.shift();
 
   return refinedData;
 }
-
-export const filterData = (data: AdjacentLot[]) => {
-  const filteredData = [];
-  for (let i = 0; i < data.length; i++) {
-    const tmpLots = data[i].lots.filter(
-      (lot) => lot.auctionPrice && lot.auctionPrice > 0
-    );
-
-    if (tmpLots.length > 0) {
-      filteredData.push({
-        id: data[i].id,
-        lots: tmpLots,
-      });
-    }
-  }
-  return filteredData;
-};
 
 export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat("vi-VN").format(value);
@@ -132,8 +124,14 @@ export const generateHTMLForPrint = (data: AdjacentLot[]) => {
           </thead>
           <tbody>
             ${data
-              .map(
-                (group) => `
+              .map((group) => {
+                if (group.id === -1)
+                  return `
+                  <tr>
+                    <td colspan="5" style="text-align: left;">${group.section}</td>
+                  </tr>`;
+
+                return `
                 <tr>
                   <td colspan="5" style="text-align: left;">Liền kề ${group.id}</td>
                 </tr>
@@ -150,8 +148,8 @@ export const generateHTMLForPrint = (data: AdjacentLot[]) => {
                   `
                   )
                   .join("")}
-              `
-              )
+                `;
+              })
               .join("")}
           </tbody>
         </table>
@@ -214,8 +212,14 @@ export const generateHTMLForPreview = (data: AdjacentLot[]) => {
             </thead>
             <tbody>
               ${data
-                .map(
-                  (group) => `
+                .map((group) => {
+                  if (group.id === -1)
+                    return `
+                    <tr>
+                      <td colspan="5" style="text-align: left;">${group.section}</td>
+                    </tr>`;
+
+                  return `
                   <tr>
                     <td colspan="5" style="text-align: left;">Liền kề ${group.id}</td>
                   </tr>
@@ -232,8 +236,8 @@ export const generateHTMLForPreview = (data: AdjacentLot[]) => {
                     `
                     )
                     .join("")}
-                `
-                )
+                  `;
+                })
                 .join("")}
             </tbody>
           </table>

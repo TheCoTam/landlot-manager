@@ -1,7 +1,11 @@
 import { useDebounce } from "@/hooks/use-debounce";
 import { AdjacentLot, Lot } from "@/utils/excelUtils";
+import {
+  exTractIdAndSection,
+  getLotsDetailsBySectionAndId,
+} from "@/utils/utils";
 import { Camera } from "lucide-react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Modal,
   Pressable,
@@ -20,6 +24,7 @@ interface Props {
 }
 
 export type EditedLot = {
+  section?: number;
   landId: number;
   lotId: number;
   area: number;
@@ -30,20 +35,65 @@ export type EditedLot = {
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+const SectionSelection = ({
+  sectionList,
+  value,
+  setValue,
+}: {
+  sectionList: string[];
+  value: number;
+  setValue: (value: number) => void;
+}) => {
+  const dropdownData = sectionList.map((section, index) => ({
+    label: section,
+    value: (index + 1).toString(),
+  }));
+
+  return (
+    <View className="flex flex-row">
+      <Dropdown
+        data={dropdownData}
+        labelField="label"
+        valueField="value"
+        placeholder="Chọn khu vực thôn, xã"
+        value={value.toString()}
+        onChange={(item) => setValue(parseInt(item.value))}
+        style={{
+          flex: 1,
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 6,
+          paddingHorizontal: 10,
+          paddingVertical: 6,
+        }}
+      />
+    </View>
+  );
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
 const LandSelection = React.memo(
   ({
     landIdList,
     value,
     setValue,
+    disabled = false,
   }: {
     landIdList: number[];
     value: number;
     setValue: (value: number) => void;
+    disabled?: boolean;
   }) => {
     const dropdownData = landIdList.map((num) => ({
       label: num.toString(),
       value: num,
     }));
+
+    useEffect(() => {
+      setValue(-1);
+    }, [landIdList]);
 
     return (
       <View className="flex flex-row gap-2 items-center flex-[3]">
@@ -55,7 +105,7 @@ const LandSelection = React.memo(
           placeholder="Chọn liền kề"
           value={value}
           onChange={(item) => setValue(item.value)}
-          disable={dropdownData.length === 0}
+          disable={disabled}
           style={{
             flex: 1,
             borderWidth: 1,
@@ -229,24 +279,56 @@ const TotalPrice = ({ total }: { total: number }) => {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 const EditPriceModal = ({ visible, onClose, data, onUpdate }: Props) => {
-  const landIdList = data.map((item) => item.id);
+  const { sectionList, landIdList } = useMemo(() => {
+    return exTractIdAndSection(data);
+  }, [data]);
+  const [landIds, setLandIds] = useState<number[]>(landIdList[0]);
   const [editedLot, setEditedLot] = useState<EditedLot>({
+    section: -1,
     landId: -1,
     lotId: -1,
     area: 0,
     auctionPrice: 0,
+    total: 0,
   } as EditedLot);
   const [lotsList, setLotsList] = useState<Lot[]>([]);
 
   const possiableUpdate = editedLot.landId !== -1 && editedLot.lotId !== -1;
 
-  const setLandSelection = useCallback(
-    (value: number) => {
-      setEditedLot((prev) => ({ ...prev, landId: value }) as EditedLot);
-      setLotsList(data.find((item) => item.id === value)?.lots || []);
-    },
-    [data]
-  );
+  useEffect(() => {
+    if (landIdList && landIdList.length > 0) {
+      setLandIds(landIdList[0]);
+    }
+  }, [landIdList]);
+
+  const handleSetSection = (sectionIndex: number) => {
+    setEditedLot({
+      section: sectionIndex,
+      landId: -1,
+      lotId: -1,
+      area: 0,
+      auctionPrice: 0,
+      total: 0,
+    } as EditedLot);
+    const landIdsForSection = landIdList[sectionIndex - 1] || [];
+    setLandIds(landIdsForSection);
+  };
+
+  const setLandSelection = (value: number) => {
+    setEditedLot(
+      (prev) =>
+        ({
+          section: prev.section,
+          landId: value,
+          lotId: -1,
+          area: 0,
+          auctionPrice: 0,
+        }) as EditedLot
+    );
+    setLotsList(
+      getLotsDetailsBySectionAndId(data, editedLot.section || 0, value)
+    );
+  };
 
   const setLotSelection = ({
     lotId,
@@ -287,10 +369,12 @@ const EditPriceModal = ({ visible, onClose, data, onUpdate }: Props) => {
 
   const handleCloseModal = () => {
     setEditedLot({
+      section: -1,
       landId: -1,
       lotId: -1,
       area: 0,
       auctionPrice: 0,
+      total: 0,
     } as EditedLot);
     setLotsList([]);
     onClose();
@@ -313,11 +397,19 @@ const EditPriceModal = ({ visible, onClose, data, onUpdate }: Props) => {
           </View>
 
           <View className="flex gap-4">
+            {sectionList.length > 0 && (
+              <SectionSelection
+                sectionList={sectionList}
+                value={editedLot.section || -1}
+                setValue={handleSetSection}
+              />
+            )}
             <View className="flex flex-row items-center gap-4">
               <LandSelection
-                landIdList={landIdList}
+                landIdList={landIds}
                 value={editedLot.landId}
                 setValue={setLandSelection}
+                disabled={sectionList.length > 0 && editedLot.section === -1}
               />
               <LotSelection
                 lotsData={lotsList}

@@ -7,12 +7,12 @@ import { read as xlsxRead, utils as xlsxUtils } from "xlsx";
 
 import { DetailData } from "@/components/DetailData";
 import { EditedLot } from "@/components/excel/EditPriceModal";
-import ExportButton from "@/components/excel/ExportButton";
+import ExportButton from "@/components/ExportButton";
+import ExportModal from "@/components/ExportModal";
 import SelectFile from "@/components/SelectFile";
-
-import ExportModal from "@/components/excel/ExportModal";
 import { OPTIONS } from "@/Constants/DataFilter";
-import { AdjacentLot, filterData, refineData } from "@/utils/excelUtils";
+import { AdjacentLot, refineData } from "@/utils/excelUtils";
+import { filterData } from "@/utils/utils";
 
 const Excel = () => {
   const [data, setData] = useState<AdjacentLot[]>([]);
@@ -61,8 +61,41 @@ const Excel = () => {
   };
 
   const handleUpdateLot = (editedLot: EditedLot) => {
+    if (editedLot.section === -1) {
+      setData((prevData) =>
+        prevData.map((adjacentLot) => {
+          if (adjacentLot.id !== editedLot.landId) return adjacentLot;
+
+          const updatedLots = adjacentLot.lots.map((lot) =>
+            lot.lotId === editedLot.lotId
+              ? {
+                  lotId: lot.lotId,
+                  auctionPrice: editedLot.auctionPrice || 0,
+                  area: lot.area,
+                  total: editedLot.total || 0,
+                }
+              : lot
+          );
+
+          return {
+            ...adjacentLot,
+            lots: updatedLots,
+          };
+        })
+      );
+      return;
+    }
+
+    let currentGroupIndex = 0;
     setData((prevData) =>
       prevData.map((adjacentLot) => {
+        if (adjacentLot.id === -1) {
+          currentGroupIndex += 1;
+          return adjacentLot;
+        }
+
+        if (currentGroupIndex < editedLot.section!) return adjacentLot;
+
         if (adjacentLot.id !== editedLot.landId) return adjacentLot;
 
         const updatedLots = adjacentLot.lots.map((lot) =>
@@ -75,7 +108,6 @@ const Excel = () => {
               }
             : lot
         );
-
         return {
           ...adjacentLot,
           lots: updatedLots,
@@ -108,7 +140,9 @@ const Excel = () => {
         selectedFilter={selectedOption}
         setSelectedFilter={setSelectedOption}
       />
-      {displayData.length > 0 && <ExportButton onExport={handleExport} />}
+      {displayData.filter((item) => item.id !== -1).length > 0 && (
+        <ExportButton onExport={handleExport} />
+      )}
       <ExportModal
         visible={exportModalVisible}
         onClose={handleCloseExportModal}

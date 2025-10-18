@@ -125,7 +125,7 @@ const ExportModal = ({
             </Animated.View>
           ) : (
             <TouchableOpacity
-              onPress={handlePreview}
+              onPress={createPDF}
               className="flex flex-row items-center"
             >
               <Text className="font-semibold text-sm">Xuất file</Text>

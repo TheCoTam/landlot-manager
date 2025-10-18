@@ -1,6 +1,7 @@
 import { getDocumentAsync } from "expo-document-picker";
 import { File } from "expo-file-system";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { read as xlsxRead, utils as xlsxUtils } from "xlsx";
@@ -11,7 +12,7 @@ import ExportButton from "@/components/ExportButton";
 import ExportModal from "@/components/ExportModal";
 import SelectFile from "@/components/SelectFile";
 import { OPTIONS } from "@/Constants/DataFilter";
-import { AdjacentLot, refineData } from "@/utils/excelUtils";
+import { AdjacentLot, loadFileFromUri, refineData } from "@/utils/excelUtils";
 import { filterData } from "@/utils/utils";
 
 const Excel = () => {
@@ -20,6 +21,8 @@ const Excel = () => {
   const [fileName, setFileName] = useState<string>("Chọn file cần xử lý");
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(OPTIONS[0].value);
+  const router = useRouter();
+  const { uri, fileName: paramFileName } = useLocalSearchParams();
 
   useEffect(() => {
     if (selectedOption === "all") {
@@ -28,6 +31,22 @@ const Excel = () => {
       setDisplayData(filterData(data));
     }
   }, [data, selectedOption]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadDataFromUri = async () => {
+        if (uri && paramFileName) {
+          const dataFromUri = await loadFileFromUri(uri.toString());
+          setData(dataFromUri);
+          setFileName(paramFileName.toString());
+
+          router.replace("/excel");
+        }
+      };
+
+      loadDataFromUri();
+    }, [uri, paramFileName])
+  );
 
   const handlePickFile = async () => {
     try {

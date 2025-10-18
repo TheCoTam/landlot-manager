@@ -1,3 +1,6 @@
+import { File } from "expo-file-system";
+import { read as xlsxRead, utils as xlsxUtils } from "xlsx";
+
 export type Lot = {
   lotId: number;
   area: number;
@@ -10,6 +13,20 @@ export type AdjacentLot = {
   lots: Lot[];
   section?: string;
 };
+
+export async function loadFileFromUri(uri: string) {
+  const file = new File(uri);
+  const base64Data = await file.base64();
+  const workbook = xlsxRead(base64Data, { type: "base64" });
+
+  const sheetNames = workbook.SheetNames;
+
+  const firstSheet = workbook.Sheets[sheetNames[0]];
+
+  const sheetData = xlsxUtils.sheet_to_json(firstSheet, { header: 1 });
+
+  return refineData(sheetData);
+}
 
 export function refineData(sheetData: any[]) {
   const [headers, ...rawData] = sheetData;

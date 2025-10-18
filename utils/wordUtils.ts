@@ -2,12 +2,34 @@ import {
   NUM_OF_COLS_DATA,
   WORD_HEADER_KEYWORDS,
 } from "@/Constants/word/WordHeader";
+import { File } from "expo-file-system";
+import { XMLParser } from "fast-xml-parser";
+import JSZip from "jszip";
 import { AdjacentLot } from "./excelUtils";
 
 interface DocxBody {
   "w:p"?: any | any[];
   "w:tbl"?: any | any[];
   [key: string]: any;
+}
+
+export async function LoadFileFromUri(uri: string) {
+  const file = new File(uri);
+  const base64Data = await file.base64();
+  const zip = await JSZip.loadAsync(base64Data, { base64: true });
+
+  const docXml = await zip.file("word/document.xml")?.async("string");
+  if (!docXml) throw new Error("Không tìm thấy nội dung trong file Word");
+
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "",
+  });
+
+  const json = parser.parse(docXml);
+  const body = json["w:document"]["w:body"];
+
+  return extractWordData(body);
 }
 
 export function extractWordData(docXml: DocxBody) {

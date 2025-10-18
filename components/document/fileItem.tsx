@@ -1,5 +1,6 @@
 import { isAvailableAsync, shareAsync } from "expo-sharing";
 import {
+  DiamondPlus,
   Eye,
   FileDown,
   FileSpreadsheet,
@@ -11,6 +12,7 @@ import { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 
 import { fileSizeFormater } from "@/utils/fileManagerUtils";
+import { useRouter } from "expo-router";
 import PdfPreviewer from "../pdfPreviewer";
 
 interface FileItemProps {
@@ -128,6 +130,7 @@ const FileItem = ({
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [viewFileVisible, setViewFileVisible] = useState(false);
   const [base64, setBase64] = useState<string>("");
+  const router = useRouter();
 
   const handleViewFile = async () => {
     const base64 = await getBase64();
@@ -156,16 +159,24 @@ const FileItem = ({
     loadFiles();
   };
 
+  const handleNavigateToProcessing = () => {
+    if (type === "xlsx" || type === "xls") {
+      router.push({ pathname: "/excel", params: { uri, fileName: name } });
+    } else {
+      router.push({ pathname: "/word", params: { uri, fileName: name } });
+    }
+  };
+
   return (
     <View className="flex flex-row items-center border-b border-gray-300 mx-2 mt-4 pb-4">
       {type.toLowerCase() === "pdf" && (
-        <FileDown size={50} strokeWidth={1} color="gray" />
+        <FileDown size={50} strokeWidth={1} color="orange" />
       )}
       {type.toLowerCase() === "xlsx" && (
-        <FileSpreadsheet size={50} strokeWidth={1} color="gray" />
+        <FileSpreadsheet size={50} strokeWidth={1} color="green" />
       )}
       {type.toLowerCase() === "docx" && (
-        <FileText size={50} strokeWidth={1} color="gray" />
+        <FileText size={50} strokeWidth={1} color="blue" />
       )}
       <View className="ml-2 gap-1">
         <Text className="text-xl font-semibold">
@@ -176,9 +187,15 @@ const FileItem = ({
         </Text>
       </View>
       <View className="ml-auto flex flex-row items-center gap-4">
-        <TouchableOpacity onPress={handleViewFile}>
-          <Eye color="gray" />
-        </TouchableOpacity>
+        {type === "pdf" ? (
+          <TouchableOpacity onPress={handleViewFile}>
+            <Eye color="gray" />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={handleNavigateToProcessing}>
+            <DiamondPlus color="gray" />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={handleShareFile}>
           <Share2 color="gray" />
         </TouchableOpacity>

@@ -3,7 +3,7 @@ import { File } from "expo-file-system";
 import { XMLParser } from "fast-xml-parser";
 import JSZip from "jszip";
 import { FileText } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,7 +15,8 @@ import SelectFile from "@/components/SelectFile";
 import { OPTIONS } from "@/Constants/DataFilter";
 import { AdjacentLot } from "@/utils/excelUtils";
 import { filterData } from "@/utils/utils";
-import { extractWordData } from "@/utils/wordUtils";
+import { extractWordData, LoadFileFromUri } from "@/utils/wordUtils";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 const Word = () => {
   const [data, setData] = useState<AdjacentLot[]>([]);
@@ -23,6 +24,8 @@ const Word = () => {
   const [fileName, setFileName] = useState<string>("Chọn file cần xử lý");
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState(OPTIONS[0].value);
+  const router = useRouter();
+  const { uri, fileName: paramFileName } = useLocalSearchParams();
 
   useEffect(() => {
     if (selectedOption === "all") {
@@ -31,6 +34,22 @@ const Word = () => {
       setDisplayData(filterData(data));
     }
   }, [data, selectedOption]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadDataFromUri = async () => {
+        if (uri && paramFileName) {
+          const dataFromUri = await LoadFileFromUri(uri.toString());
+          setData(dataFromUri);
+          setFileName(paramFileName.toString());
+
+          router.replace("/word");
+        }
+      };
+
+      loadDataFromUri();
+    }, [uri, paramFileName])
+  );
 
   const handlePickFile = async () => {
     try {

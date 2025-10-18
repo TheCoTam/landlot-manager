@@ -1,4 +1,6 @@
 import FileItem from "@/components/document/fileItem";
+import FileManagerHeader from "@/components/document/header";
+import { EXCEL_FILE_EXTENSIONS } from "@/Constants/fileManager/fileExtension";
 import { OPTIONS } from "@/Constants/FileTabSelector";
 import { File, Paths } from "expo-file-system";
 import { useFocusEffect } from "expo-router";
@@ -22,7 +24,11 @@ function FileManager() {
       const directory = Paths.document;
       const filteredFiles = directory
         .list()
-        .filter((item) => item.uri.endsWith(".pdf")) as File[];
+        .filter((item) =>
+          EXCEL_FILE_EXTENSIONS.some((ext) =>
+            item.uri.toLowerCase().endsWith(ext)
+          )
+        ) as File[];
 
       setFiles(filteredFiles);
     } catch (error) {
@@ -38,9 +44,7 @@ function FileManager() {
 
   return (
     <SafeAreaView className="flex-1">
-      <Text className="text-4xl font-semibold px-4 pt-10">
-        Tài liệu của tôi
-      </Text>
+      <FileManagerHeader loadFiles={loadFiles} />
       <View className="flex flex-row items-center m-4 border gap-2 px-2 rounded-lg bg-gray-200 border-gray-400">
         <Search size={23} />
         <TextInput placeholder="Nhập tên file..." className="flex-1 text-lg" />

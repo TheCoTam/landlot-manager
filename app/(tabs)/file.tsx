@@ -1,23 +1,51 @@
-import FileItem from "@/components/document/fileItem";
-import FileManagerHeader from "@/components/document/header";
 import { EXCEL_FILE_EXTENSIONS } from "@/Constants/fileManager/fileExtension";
-import { OPTIONS } from "@/Constants/FileTabSelector";
 import { File, Paths } from "expo-file-system";
 import { useFocusEffect } from "expo-router";
-import { Search } from "lucide-react-native";
-import { useCallback, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import FileFilter from "@/components/document/fileFilter";
+import FileItem from "@/components/document/fileItem";
+import FileManagerHeader from "@/components/document/header";
+import { OPTIONS } from "@/Constants/FileTabSelector";
 
 function FileManager() {
   const [selectedOption, setSelectedOption] = useState(OPTIONS[0].value);
   const [files, setFiles] = useState<File[]>([]);
+  const [searchValue, setSearchValue] = useState<string>("");
+
+  const filteredFiles = useMemo(
+    () =>
+      files
+        .filter((file) => {
+          const fileName = file.uri.split("/").pop() || "Unknown";
+          if (!fileName.toLocaleLowerCase().includes(searchValue)) return false;
+
+          switch (selectedOption) {
+            case "all":
+              return true;
+            case "excel":
+              const EXCEL_EXT = [".xls", ".xlsx"];
+              return EXCEL_EXT.some((ext) =>
+                file.uri.toLowerCase().endsWith(ext)
+              );
+            case "word":
+              const WORD_EXT = [".doc", ".docx"];
+              return WORD_EXT.some((ext) =>
+                file.uri.toLowerCase().endsWith(ext)
+              );
+            case "pdf":
+              return file.uri.toLowerCase().endsWith(".pdf");
+            default:
+              return true;
+          }
+        })
+        .sort((a, b) =>
+          selectedOption === "recent" ? b.creationTime! - a.creationTime! : 0
+        ),
+    [files, selectedOption, searchValue]
+  );
 
   const loadFiles = () => {
     try {
@@ -42,33 +70,19 @@ function FileManager() {
     }, [])
   );
 
+  console.log(filteredFiles[0]);
+
   return (
     <SafeAreaView className="flex-1">
       <FileManagerHeader loadFiles={loadFiles} />
-      <View className="flex flex-row items-center m-4 border gap-2 px-2 rounded-lg bg-gray-200 border-gray-400">
-        <Search size={23} />
-        <TextInput placeholder="Nhập tên file..." className="flex-1 text-lg" />
-      </View>
-      <View className="border-b border-gray-300 pl-4">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              className={`px-4 py-2 mr-2 border-b-2 ${selectedOption === option.value ? "border-blue-400" : "border-transparent"}`}
-              onPress={() => setSelectedOption(option.value)}
-            >
-              <Text
-                className={`text-lg ${selectedOption === option.value && "text-blue-500"}`}
-              >
-                {option.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+      <FileFilter
+        selectedOption={selectedOption}
+        setSelectedOption={setSelectedOption}
+        setSearchValue={setSearchValue}
+      />
       <View className="px-4">
         <ScrollView>
-          {files.map((file, index) => {
+          {filteredFiles.map((file, index) => {
             const fileName = file.uri.split("/").pop() || "Unknown";
             const fileType = fileName.split(".").pop() || "unknown";
 

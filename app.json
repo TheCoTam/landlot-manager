@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Real_Estate",
-    "slug": "fb-automation",
+    "name": "FilePilot",
+    "slug": "file-pilot",
     "splash": {
       "image": "./assets/images/splash.jpg",
       "backgroundColor": "#ffffff",
@@ -10,7 +10,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/splash.jpg",
-    "scheme": "fbautomation",
+    "scheme": "filepilot",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -43,6 +43,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e753e8ec-6a10-4cf6-a9ac-f0f77322ac11"
+      }
     }
   }
 }

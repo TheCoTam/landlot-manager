@@ -7,7 +7,7 @@ import { TAB_MENU } from "../../Constants/TabMenu";
 const TabLayout = () => {
   return (
     <React.Fragment>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" backgroundColor="#ffffff" />
       <Tabs
         screenOptions={{
           headerShown: false,

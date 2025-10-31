@@ -1,8 +1,9 @@
 import { EXCEL_FILE_EXTENSIONS } from "@/Constants/fileManager/fileExtension";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import { File, Paths } from "expo-file-system";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import FileFilter from "@/components/document/fileFilter";
@@ -70,8 +71,6 @@ function FileManager() {
     }, [])
   );
 
-  console.log(filteredFiles[0]);
-
   return (
     <SafeAreaView className="flex-1">
       <FileManagerHeader loadFiles={loadFiles} />
@@ -80,32 +79,41 @@ function FileManager() {
         setSelectedOption={setSelectedOption}
         setSearchValue={setSearchValue}
       />
-      <View className="px-4">
-        <ScrollView>
-          {filteredFiles.map((file, index) => {
-            const fileName = file.uri.split("/").pop() || "Unknown";
-            const fileType = fileName.split(".").pop() || "unknown";
+      <View className="px-4 flex-1">
+        {filteredFiles.length > 0 ? (
+          <ScrollView>
+            {filteredFiles.map((file, index) => {
+              const fileName = file.uri.split("/").pop() || "Unknown";
+              const fileType = fileName.split(".").pop() || "unknown";
 
-            const handleDeleteFile = () => {
-              file.delete();
-            };
-            return (
-              <FileItem
-                key={index}
-                name={fileName}
-                type={fileType}
-                date={file.modificationTime}
-                size={file.size}
-                uri={file.uri}
-                getBase64={() =>
-                  (file.base64 as unknown as () => Promise<string>)()
-                }
-                loadFiles={loadFiles}
-                onDelete={handleDeleteFile}
-              />
-            );
-          })}
-        </ScrollView>
+              const handleDeleteFile = () => {
+                file.delete();
+              };
+              return (
+                <FileItem
+                  key={index}
+                  name={fileName}
+                  type={fileType}
+                  date={file.modificationTime}
+                  size={file.size}
+                  uri={file.uri}
+                  getBase64={() =>
+                    (file.base64 as unknown as () => Promise<string>)()
+                  }
+                  loadFiles={loadFiles}
+                  onDelete={handleDeleteFile}
+                />
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <View className="flex-1 flex gap-5 justify-center items-center">
+            <AntDesign name="frown" size={120} color="gray" />
+            <Text className="text-xl text-gray-500 font-semibold">
+              Không tìm thấy tài liệu.
+            </Text>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

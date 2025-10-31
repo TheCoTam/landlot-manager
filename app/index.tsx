@@ -10,7 +10,7 @@ export default function Index() {
       </Text>
       <TouchableOpacity
         onPress={() => {
-          router.push("/home");
+          router.push("/excel");
         }}
       >
         <Text>Go Home</Text>

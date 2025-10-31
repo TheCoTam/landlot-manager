@@ -3,4 +3,13 @@ export const IMAGES = {
   genrang_2: require("./genrang_2.jpg"),
   genrang_3: require("./genrang_3.jpg"),
   genrang_4: require("./genrang_4.jpg"),
+  guild_1: require("./guild_1.png"),
+  guild_2: require("./guild_2.jpg"),
+  guild_3: require("./guild_3.jpg"),
+  guild_4: require("./guild_4.jpg"),
+  guild_5: require("./guild_5.jpg"),
+  guild_6: require("./guild_6.jpg"),
+  guild_7: require("./guild_7.jpg"),
+  guild_8: require("./guild_8.jpg"),
+  splash: require("./splash.jpg"),
 };

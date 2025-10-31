@@ -1,18 +1,11 @@
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { useRouter } from "expo-router";
 import { isAvailableAsync, shareAsync } from "expo-sharing";
-import {
-  DiamondPlus,
-  Eye,
-  FileDown,
-  FileSpreadsheet,
-  FileText,
-  Share2,
-  Trash2,
-} from "lucide-react-native";
+import { DiamondPlus, Eye, Share2, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 
 import { fileSizeFormater } from "@/utils/fileManagerUtils";
-import { useRouter } from "expo-router";
 import PdfPreviewer from "../pdfPreviewer";
 
 interface FileItemProps {
@@ -170,13 +163,13 @@ const FileItem = ({
   return (
     <View className="flex flex-row items-center border-b border-gray-300 mx-2 mt-4 pb-4">
       {type.toLowerCase() === "pdf" && (
-        <FileDown size={50} strokeWidth={1} color="orange" />
+        <AntDesign name="file-pdf" size={50} color="orange" />
       )}
       {type.toLowerCase() === "xlsx" && (
-        <FileSpreadsheet size={50} strokeWidth={1} color="green" />
+        <AntDesign name="file-excel" size={50} color="green" />
       )}
       {type.toLowerCase() === "docx" && (
-        <FileText size={50} strokeWidth={1} color="blue" />
+        <AntDesign name="file-word" size={50} color="blue" />
       )}
       <View className="ml-2 gap-1">
         <Text className="text-xl font-semibold">

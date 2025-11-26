@@ -171,11 +171,11 @@ const FileItem = ({
       {type.toLowerCase() === "docx" && (
         <AntDesign name="file-word" size={50} color="blue" />
       )}
-      <View className="ml-2 gap-1">
-        <Text className="text-xl font-semibold">
+      <View className="ml-2 gap-1 max-w-[50%]">
+        <Text className="text-xl font-semibold line-clamp-1">
           {decodeURIComponent(name)}
         </Text>
-        <Text className="text-gray-500">
+        <Text className="text-gray-500 text-sm">
           {type.toUpperCase()} - {fileSizeFormater(size)}
         </Text>
       </View>

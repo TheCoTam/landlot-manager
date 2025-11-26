@@ -167,6 +167,7 @@ const ProcessScreenContainer = ({
         onClose={handleCloseExportModal}
         data={filteredData}
         inputFilename={fileName}
+        exportWithExcel={screenUri.includes("word")}
       />
     </SafeAreaView>
   );

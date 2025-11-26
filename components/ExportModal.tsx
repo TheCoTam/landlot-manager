@@ -3,6 +3,7 @@ import {
   generateHTMLForPreview,
   generateHTMLForPrint,
 } from "@/utils/excelUtils";
+import { createExcelFile } from "@/utils/wordUtils";
 import { File, Paths } from "expo-file-system";
 import { printAsync, printToFileAsync } from "expo-print";
 import {
@@ -26,11 +27,13 @@ const ExportModal = ({
   onClose,
   data,
   inputFilename,
+  exportWithExcel,
 }: {
   visible: boolean;
   onClose: () => void;
   data: AdjacentLot[];
   inputFilename: string;
+  exportWithExcel: boolean;
 }) => {
   const htmlForPrint = generateHTMLForPrint(data);
   const htmlForPreview = generateHTMLForPreview(data);
@@ -68,8 +71,21 @@ const ExportModal = ({
       }
 
       const appDirectory = Paths.document;
+      const savedPath = `${appDirectory}/${fileName}.pdf`;
+
+      // Nếu file đã tồn tại → xóa
+      const existingFile = new File(savedPath);
+      if (existingFile.exists) {
+        await existingFile.delete();
+      }
+
+      // Rename + move
       await file.rename(`${fileName}.pdf`);
       await file.move(appDirectory);
+
+      if (exportWithExcel) {
+        await createExcelFile(data, fileName);
+      }
 
       handleCloseModal();
     } catch (error) {

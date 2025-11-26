@@ -20,7 +20,7 @@ const SelectFile = ({
   const IconComponent = fileIcon;
 
   return (
-    <View className="p-10 flex flex-row gap-5">
+    <View className="p-5 flex flex-row gap-5">
       <View
         className="border-[3px] rounded-xl aspect-square items-center justify-center"
         style={{ width: SIZE, borderColor: "gray" }}
@@ -36,7 +36,10 @@ const SelectFile = ({
           )}
         </TouchableOpacity>
       </View>
-      <Text key="splitter" className="text-3xl font-semibold self-center">
+      <Text
+        key="splitter"
+        className="text-2xl font-semibold self-center flex-1 line-clamp-4"
+      >
         {fileName}
       </Text>
     </View>

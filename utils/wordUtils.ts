@@ -1,10 +1,12 @@
+import { File, Paths } from "expo-file-system";
+import { XMLParser } from "fast-xml-parser";
+import JSZip from "jszip";
+import { utils as excelUtils, write } from "xlsx";
+
 import {
   NUM_OF_COLS_DATA,
   WORD_HEADER_KEYWORDS,
 } from "@/Constants/word/WordHeader";
-import { File } from "expo-file-system";
-import { XMLParser } from "fast-xml-parser";
-import JSZip from "jszip";
 import { AdjacentLot } from "./excelUtils";
 
 interface DocxBody {
@@ -142,3 +144,70 @@ function extractTextFromCell(cell: any): string {
 
   return texts.join(" ").trim();
 }
+
+export const createExcelFile = async (
+  data: AdjacentLot[],
+  fileName: string
+) => {
+  try {
+    const rows = [];
+
+    // Header
+    rows.push(["Lô đất", "Diện tích", "Đơn giá", "Thành tiền", "Ghi chú"]);
+
+    // Body
+    data.forEach((group) => {
+      if (group.id === -1) {
+        rows.push([group.section, "", "", "", ""]);
+      } else {
+        rows.push([`Liền kề ${group.id}`, "", "", "", ""]);
+
+        group.lots.forEach((lot) => {
+          rows.push([lot.lotId, lot.area, lot.auctionPrice, lot.total, ""]);
+        });
+      }
+    });
+
+    // Tạo worksheet
+    const worksheet = excelUtils.aoa_to_sheet(rows);
+
+    // Merge ô cho section và group
+    const merges: any[] = [];
+    let rowIndex = 1;
+
+    data.forEach((group) => {
+      if (group.id === -1) {
+        merges.push({
+          s: { r: rowIndex, c: 0 },
+          e: { r: rowIndex, c: 4 },
+        });
+        rowIndex++;
+      } else {
+        merges.push({
+          s: { r: rowIndex, c: 0 },
+          e: { r: rowIndex, c: 4 },
+        });
+        rowIndex++;
+
+        group.lots.forEach(() => {
+          rowIndex++;
+        });
+      }
+    });
+
+    worksheet["!merges"] = merges;
+
+    // Tạo workbook
+    const workbook = excelUtils.book_new();
+    excelUtils.book_append_sheet(workbook, worksheet, fileName);
+
+    // Xuất file dạng base64
+    const arrayBuffer = write(workbook, { type: "array", bookType: "xlsx" });
+    const uint8 = new Uint8Array(arrayBuffer);
+    const file = new File(Paths.document, `${fileName}.xlsx`);
+    await file.create({ overwrite: true });
+    await file.write(uint8);
+  } catch (error) {
+    console.log("Error creating Excel:", error);
+  }
+};

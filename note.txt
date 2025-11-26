@@ -1,0 +1,3 @@
+- thêm lựa chọn tạo file excel để chỉnh sửa cho những lần sau
+- khi in có thể tạo thừa 1 trang trắng, nên kiểm tra
+- hiển thị file pdf trong trang File đang chỉ hiển thị trang đầu tiên

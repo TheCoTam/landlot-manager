@@ -7,8 +7,6 @@ const PdfPreviewer = ({
   base64: string;
   fileUri: string;
 }) => {
-  // console.log(base64);
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -70,18 +68,6 @@ const PdfPreviewer = ({
       </body>
     </html>
   `;
-
-  //   const html = `
-  //         <html>
-  //         <body style="margin:0;padding:0;height:100vh;">
-  //             <iframe
-  //             src="${fileUri}"
-  //             width="100%" height="100%"
-  //             style="border:none;"
-  //             ></iframe>
-  //         </body>
-  //         </html>
-  //     `;
 
   return (
     <WebView

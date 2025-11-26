@@ -49,7 +49,7 @@ export const DetailData = ({
   return (
     <View className="px-4 flex-1 gap-4">
       <View className="flex flex-row justify-between items-center">
-        <Text className="text-2xl font-semibold">Tổng số lô: {totalLots}</Text>
+        <Text className="text-lg font-semibold">Tổng số lô: {totalLots}</Text>
         <View className="flex flex-row gap-4">
           {OPTIONS.map((option) => (
             <RadioButton
@@ -60,7 +60,7 @@ export const DetailData = ({
             />
           ))}
         </View>
-        <View className="flex flex-row items-center gap-6">
+        <View className="flex flex-row items-center gap-3">
           {data.length > 0 && (
             <TouchableOpacity onPress={() => setEditPriceVisible(true)}>
               <Pencil size={22} />
